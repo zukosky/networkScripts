@@ -4,6 +4,7 @@ print (os.name)
 
 host = '192.168.1.70'
 
+
 # create a raw socket and bind it to the public interface
 if os.name == 'nt':
     socket_protocol = socket.IPPROTO_IP
