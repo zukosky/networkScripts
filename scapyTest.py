@@ -1,7 +1,7 @@
-import sys
-from scapy.all import *
+import scapy
+from scapy.all import sniff
 
+def dummyHandler(packet):
 
-p=sr1(IP(dst=sys.argv[1])/ICMP())
-if p:
-    p.show()
+	return
+sniff(filter='ip',prn=dummyHandler,store=0)
