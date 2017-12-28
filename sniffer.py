@@ -1,12 +1,13 @@
 import socket
-#from general import *
-from network.ethernet import *
-from network.ipv4 import *
-from network.icmp import *
-from network.tcp import *
-from network.udp import *
-from network.pcap import *
-from network.http import *
+from general import *
+import network
+#from network.ethernet import *
+#from network.ipv4 import *
+#from network.icmp import *
+#from network.tcp import *
+#from network.udp import *
+#from network.pcap import *
+#from network.http import *
 
 TAB_1 = '\t - '
 TAB_2 = '\t\t - '
@@ -20,12 +21,12 @@ DATA_TAB_4 = '\t\t\t\t   '
 
 
 def main():
-    pcap = Pcap('capture.pcap')
+    #pcap = Pcap('capture.pcap')
     conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
 
     while True:
         raw_data, addr = conn.recvfrom(65535)
-        pcap.write(raw_data)
+        #pcap.write(raw_data)
         eth = Ethernet(raw_data)
 
         print('\nEthernet Frame:')
