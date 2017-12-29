@@ -1,5 +1,11 @@
 from scapy.all import *
-
+################################################################
+# beaconSniffer.py
+#
+# This script will take a WLAN network card in Monitor mode and
+# list all of the unique dot11 beacons and corresponding MAC addresses
+#
+#################################################################
 ap_list = []
 
 def PacketHandler(pkt) :
