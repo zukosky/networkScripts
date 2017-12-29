@@ -7,9 +7,14 @@ def dummyHandler(packet):
 
 
 # The following will sniff 10  packats and print out a summary when it finds them
-a = sniff(count=2)
+a = sniff(count=5)
 a.nsummary()
-# a[0].show()
+a[0].show()
+print(a[0])
+a[1].show()
+print(a[1])
+a[2].show()
+print(a[2])
 
 # This will send off an ICMP packet to my VPS
 send(IP(dst="45.55.160.23") / ICMP())
