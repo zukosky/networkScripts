@@ -2,6 +2,7 @@ from scapy.all import *
 import time
 import datetime
 import sys
+from netutils import getMACAddressType
 ################################################################
 # beaconSniffer.py
 #
@@ -9,17 +10,6 @@ import sys
 # list all of the unique MAC address - Probe combinations
 #
 #################################################################
-#################################################################
-# Function for deciding if a MAC address is random/administratively assigned
-#################################################################
-def getMACAddressType(MACAddress):
-    # Administratively assigned addresses have bit 1 = 1
-    binVal = int(MACAddress[:2], 16)
-    if((binVal & 2)>0):
-        MACType = "Assigned"
-    else:
-        MACType = "Factory"
-    return(MACType)
 #################################################################
 # Function for reading the list of local MAC address (my own devices)
 #################################################################
@@ -46,7 +36,7 @@ mac_count = []
 TAB_1 = "\t"
 DOT11_MANAGEMENT_FRAME = 0
 DOT11_PROBE_REQUEST = 4
-formatString ="{: <4} {: <10} {: <10} {: <20} {: <20} {: <40} {: <10}"
+formatString ="{: <4} {: <10} {: <5} {: <20} {: <10} {: <20} {: <40}"
 #Read the OUI Reference FIle
 fName = "oui-clean.txt"
 fileHandle = open(fName, 'r')
@@ -83,7 +73,7 @@ def uniquePacketHandler(pkt) :
                     #ls(pkt)
                     #print formatString.format(str(len(mac_list)), str(datetime.datetime.now().time())[0:8],pkt.addr2, pkt.info)
                     print formatString.format(str(len(mac_list)), str(datetime.datetime.now().time())[0:8],
-                                              rssi, pkt.addr2, pkt.info, thisOui,getMACAddressType(pkt.addr2))
+                                              rssi, pkt.addr2,getMACAddressType(pkt.addr2), pkt.info, thisOui)
                     fileOutHandle.write(formatString.format(str(len(mac_list)), str(datetime.datetime.now().time())[0:8],
                                               rssi, pkt.addr2, pkt.info, thisOui))
     except KeyboardInterrupt:
@@ -91,7 +81,7 @@ def uniquePacketHandler(pkt) :
         sys.exit()
 
 #Scapy by default stores all packets.  Need store=0.
-print formatString.format ("num","Time","Power","MAC","ESSID","Manufacturer","MACType")
+print formatString.format ("num","Time","Power","MAC","MACType","ESSID","Manufacturer")
 while (True):
     try:
         sniff(iface="wlan0", prn = uniquePacketHandler, store=0)
