@@ -12,13 +12,32 @@ def getMACAddressType(MACAddress):
 #################################################################
 # Function for reading if an OUI reference file
 #################################################################
-fName = "oui-clean.txt"
-fileHandle = open(fName, 'r')
-oui =[]
-manu = []
-for line in fileHandle:
-    fields = line.split('|')  # Only reads one line at a time
-    oui.append(fields[0])
-    manu.append(fields[1].rstrip())  #.rstrip() removes the trailing \n
-fileHandle.close()
-ouiRef = dict(zip(oui,manu))
+def readOUIReference():
+    fName = "oui-clean.txt"
+    fileHandle = open(fName, 'r')
+    oui =[]
+    manu = []
+    for line in fileHandle:
+        fields = line.split('|')  # Only reads one line at a time
+        oui.append(fields[0])
+        manu.append(fields[1].rstrip())  #.rstrip() removes the trailing \n
+    fileHandle.close()
+    ouiRef = dict(zip(oui,manu))
+    return ouiRef
+#################################################################
+# Function for reading the list of known MAC address (my own devices)
+#################################################################
+def readKnownMACs():
+    oui=[]
+    manu=[]
+    desc=[]
+    lmfname= "knownMACs.txt"
+    fileHandle = open(lmfname, 'r')
+    for line in fileHandle:
+        fields = line.split('|')  # Only reads one line at a time
+        oui.append(fields[0])
+        manu.append(fields[1])
+        desc.append(fields[2].rstrip())
+    fileHandle.close()
+    knownMACs = dict((z[0],list(z[1:])) for z in zip(oui,manu,desc))
+    return knownMACs

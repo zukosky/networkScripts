@@ -3,6 +3,7 @@ import time
 import datetime
 import sys
 from netutils import getMACAddressType
+from netutils import readOUIReference
 ################################################################
 # beaconSniffer.py
 #
@@ -10,27 +11,6 @@ from netutils import getMACAddressType
 # list all of the unique MAC address - Probe combinations
 #
 #################################################################
-#################################################################
-# Function for reading the list of local MAC address (my own devices)
-#################################################################
-def getLocalMACs():
-    oui=[]
-    manu=[]
-    desc=[]
-    lmfname= "localMAC.txt"
-    fileHandle = open(lmfname, 'r')
-    for line in fileHandle:
-        fields = line.split('|')  # Only reads one line at a time
-        oui.append(fields[0])
-        manu.append(fields[1])
-        desc.append(fields[2].rstrip())
-    fileHandle.close()
-    #localMACs = {oui[i]:manu[i]:desc[i] for i in xrange(len(oui))}
-    #localMACs = dict(zip(oui,zip(manu,desc)))
-    localMACs = dict((z[0],list(z[1:])) for z in zip(oui,manu,desc))
-#    localMACs = {z[0]:list(z[1:])) for z in zip(oui,manu,desc)}
-    return localMACs
-
 mac_list = []
 mac_count = []
 TAB_1 = "\t"
@@ -38,23 +18,13 @@ DOT11_MANAGEMENT_FRAME = 0
 DOT11_PROBE_REQUEST = 4
 formatString ="{: <4} {: <10} {: <5} {: <20} {: <10} {: <20} {: <40}"
 #Read the OUI Reference FIle
-fName = "oui-clean.txt"
-fileHandle = open(fName, 'r')
+ouiRef = readOUIReference()
 fOutName = "probeOut.txt"
 fileOutHandle = open(fOutName, 'w')
-oui =[]
-manu = []
-for line in fileHandle:
-    fields = line.split('|')  # Only reads one line at a time
-    oui.append(fields[0])
-    manu.append(fields[1].rstrip())  #.rstrip() removes the trailing \n
-fileHandle.close()
-ouiRef = dict(zip(oui,manu))
+#Read the list of known (mostly local) MACs
+knownMACs = readKnownMACs()
+print(knownMACs)
 
-localMACs = getLocalMACs()
-print(localMACs)
-#print(ouiRef.keys())
-#print(ouiRef.values())
 def uniquePacketHandler(pkt) :
     try:
         if pkt.haslayer(Dot11) :
