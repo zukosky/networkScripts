@@ -39,5 +39,6 @@ def readKnownMACs():
         manu.append(fields[1])
         desc.append(fields[2].rstrip())
     fileHandle.close()
-    knownMACs = dict((z[0],list(z[1:])) for z in zip(oui,manu,desc))
+    #knownMACs = dict((z[0],list(z[1:])) for z in zip(oui,desc))
+    knownMACs = dict(zip(oui,desc))
     return knownMACs
