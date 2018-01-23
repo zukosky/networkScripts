@@ -13,7 +13,9 @@ def getMACAddressType(MACAddress):
 # Function for reading if an OUI reference file
 #################################################################
 def readOUIReference():
+    global ouiRef
     fName = "oui-clean.txt"
+    print("reading ouiref")
     fileHandle = open(fName, 'r')
     oui =[]
     manu = []
@@ -23,7 +25,7 @@ def readOUIReference():
         manu.append(fields[1].rstrip())  #.rstrip() removes the trailing \n
     fileHandle.close()
     ouiRef = dict(zip(oui,manu))
-    return ouiRef
+    return ouiRef  #This might be superflous
 #################################################################
 # Function for reading the list of known MAC address (my own devices)
 #################################################################
