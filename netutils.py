@@ -1,3 +1,4 @@
+import globalVar
 #################################################################
 # Function for deciding if a MAC address is random/administratively assigned
 #################################################################
@@ -44,3 +45,20 @@ def readKnownMACs():
     #knownMACs = dict((z[0],list(z[1:])) for z in zip(oui,desc))
     knownMACs = dict(zip(oui,desc))
     return knownMACs
+#################################################################
+# Function for creating a dictionary of important characteristics of a MAC address
+#################################################################
+def detailMac(macaddr):
+
+    macDetails={}
+    macDetails['mac_address'] = macaddr
+    #Oui reference fill is upper case and uses dashes
+    macDetails['oui'] = macaddr[:8].replace(':', '-').upper()
+    #Get the manufacturer from the global dictionary
+    macDetails['manufacturer'] = globalVar.ouiRef.get(macDetails['oui'], "")
+    #Store a short version of the manufactuer.  The first word is usually significant
+    macDetails['short_manufacturer'] = macDetails['manufacturer'].split()[0]
+    #Is this a known device?
+    macDetails['known_device'] = globalVar.knownMACs.get(macaddr, "")
+    macDetails['mac_address_type'] = getMACAddressType(macaddr)
+    return macDetails
