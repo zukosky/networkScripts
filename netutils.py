@@ -16,7 +16,6 @@ def getMACAddressType(MACAddress):
 def readOUIReference():
     global ouiRef
     fName = "oui-clean.txt"
-    print("reading ouiref")
     fileHandle = open(fName, 'r')
     oui =[]
     manu = []

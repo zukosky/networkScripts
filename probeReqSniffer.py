@@ -68,7 +68,8 @@ while (True):
 #    sniff(iface="wlan0", prn = uniquePacketHandler, store=0)
 #sniff(iface="wlan0", prn = allKnownMACPacketHandler, store=0)
 #    sniff(iface="wlan0", prn=uniqueKnownPacketHandler, store=0)
-    sniff(iface="wlan0", prn=uniqueNonRandomMACPacketHandler, filter="type mgt subtype probe-req", store=0)
+#    sniff(iface="wlan0", prn=uniqueNonRandomMACPacketHandler, filter="type mgt subtype probe-req", store=0)
+    sniff(iface="wlan0", prn=NonRandomCloseMACPacketHandler, filter="type mgt subtype probe-req", store=0)
 
 
 #    except KeyboardInterrupt:

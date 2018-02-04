@@ -86,6 +86,13 @@ def uniquePacketHandler(pkt) :
                     rssi = -100
                 print formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
                                               pkt.info, thisManu,thisKnownDevice)
+######################################################################
+#
+# uniqueNonRandomMACPacketHandler()
+#
+# This packet handler is for capturing the first instance of a unique factory MAC address
+#
+######################################################################
 def uniqueNonRandomMACPacketHandler(pkt) :
     if pkt.haslayer(Dot11) :
         if pkt.type == DOT11_MANAGEMENT_FRAME and pkt.subtype == DOT11_PROBE_REQUEST :
@@ -99,6 +106,36 @@ def uniqueNonRandomMACPacketHandler(pkt) :
                 except:
                     rssi = -100
                 print formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, macDict['mac_address'],
+                                          macDict['mac_address_type'],
+                                              pkt.info, macDict['manufacturer'],macDict['known_device'])
+######################################################################
+#
+# NonRandomCloseMACPacketHandler()
+#
+# This packet handler is for capturing the first instance of a unique factory MAC address,
+# but only if the power is greater than a limit
+#
+######################################################################
+def NonRandomCloseMACPacketHandler(pkt) :
+    powerLimit = -70
+    if pkt.haslayer(Dot11) :
+        if pkt.type == DOT11_MANAGEMENT_FRAME and pkt.subtype == DOT11_PROBE_REQUEST :
+            if getMACAddressType(pkt.addr2) == "Factory":
+                #Get details about the MAC address
+                macDict = detailMac(pkt.addr2)
+                try:
+                    extra = pkt.notdecoded
+                    rssi = -(256 - ord(extra[-4:-3]))
+                except:
+                    rssi = -100
+                if rssi > powerLimit and macDict['known_device']!="PAZInspiron2013" \
+                                    and macDict['known_device'] != "NBR1" \
+                        and macDict['known_device'] != "KPK" \
+                        and macDict['known_device'] != "Sony TV" \
+                        and macDict['known_device'] != "Amazon Echo" \
+                        and macDict['known_device'] != "NBR2":
+
+                        print formatString.format("", str(datetime.datetime.now().time())[0:8],rssi, macDict['mac_address'],
                                           macDict['mac_address_type'],
                                               pkt.info, macDict['manufacturer'],macDict['known_device'])
 ######################################################################
