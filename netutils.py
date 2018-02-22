@@ -1,4 +1,6 @@
 import globalVar
+import time
+import sys, os, signal, random
 #################################################################
 # Function for deciding if a MAC address is random/administratively assigned
 #################################################################
@@ -61,3 +63,20 @@ def detailMac(macaddr):
     macDetails['known_device'] = globalVar.knownMACs.get(macaddr, "")
     macDetails['mac_address_type'] = getMACAddressType(macaddr)
     return macDetails
+def set_wifi_channel(chan):
+    #################################################################
+    # Function for changing the channel the WIFI card is listening on
+    #################################################################    
+    os.system("iw dev wlan0 set channel %d" % (chan))
+#################################################################
+# Function for randomly changing the channel the WIFI card is listening on
+#################################################################
+def channel_hopper():
+    while True:
+        try:
+            channel = random.randrange(1,12)
+            set_wifi_channel(channel)
+            #os.system("iw dev %s set channel %d" % (interface, channel))
+            time.sleep(1)
+        except KeyboardInterrupt:
+            break

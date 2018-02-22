@@ -41,7 +41,7 @@ def uniqueESSIDPacketHandler(pkt) :
                     thisOui = thisMac[:8].replace(':','-')
                     thisOui = thisOui.upper()
                     thisManu=ouiRef.get(thisOui,"")
-                    thisKnownDevice = knownMACs.get(thisMac, "")
+                    thisKnownDevice = globalVar.knownMACs.get(thisMac, "")
                     try:
                         extra = pkt.notdecoded
                         rssi = -(256 - ord(extra[-4:-3]))
