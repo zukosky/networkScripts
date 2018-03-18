@@ -9,7 +9,7 @@ mac_list = []
 
 DOT11_MANAGEMENT_FRAME = 0
 DOT11_PROBE_REQUEST = 4
-formatString = "{: <4} {: <8} {: <4} {: <18} {: <8} {: <20} {: <40} {: <15}"
+formatString = "{:<4} {:<8} {:<4} {:<18} {:<8} {:<20} {:<40} {:<15}"
 
 ######################################################################
 #
@@ -33,9 +33,9 @@ def allProbesPacketHandler(pkt):
                 rssi = -(256 - ord(extra[-4:-3]))
             except:
                 rssi = -100
-            print formatString.format(1, str(datetime.datetime.now().time())[0:8], rssi,
+            print (formatString.format(1, str(datetime.datetime.now().time())[0:8], rssi,
                                       pkt.addr2, getMACAddressType(pkt.addr2),
-                                      pkt.info, thisManu, thisKnownDevice)
+                                      pkt.info, thisManu, thisKnownDevice))
 ######################################################################
 #
 # allKnownMACPacketHandler()
@@ -58,9 +58,9 @@ def allKnownMACPacketHandler(pkt):
             except:
                 rssi = -100
             if (len(thisKnownDevice) > 0):
-                print formatString.format(1, str(datetime.datetime.now().time())[0:8], rssi,
+                print (formatString.format(1, str(datetime.datetime.now().time())[0:8], rssi,
                                               pkt.addr2, getMACAddressType(pkt.addr2),
-                                              pkt.info, thisManu, thisKnownDevice)
+                                              pkt.info, thisManu, thisKnownDevice))
 ######################################################################
 #
 # uniquePacketHandler()
@@ -85,8 +85,8 @@ def uniquePacketHandler(pkt) :
                     rssi = -(256 - ord(extra[-4:-3]))
                 except:
                     rssi = -100
-                print formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
-                                              pkt.info, thisManu,thisKnownDevice)
+                print (formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
+                                              pkt.info.decode("utf-8"), thisManu,thisKnownDevice))
 ######################################################################
 #
 # uniqueNonRandomMACPacketHandler()
@@ -106,9 +106,15 @@ def uniqueNonRandomMACPacketHandler(pkt) :
                     rssi = -(256 - ord(extra[-4:-3]))
                 except:
                     rssi = -100
-                print formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, macDict['mac_address'],
-                                          macDict['mac_address_type'],
-                                              pkt.info, macDict['manufacturer'],macDict['known_device'])
+#               xxx
+#               formatString = "{:<4} {:<8} {:<4} {:<18} {:<8} {:<20} {:<40} {:<15}"
+#                formatString = "{:<4} {:<8}  {:<4}  {:<18}  {:<8} {:<20}  {:<40} {:<15}"
+                print (formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],
+                        rssi,macDict['mac_address'],macDict['mac_address_type'],
+                        pkt.info.decode("utf-8"),macDict['manufacturer'],macDict['known_device']))
+#                print (formatString.format(str(len(mac_list)), str(datetime.datetime.now().time())[0:8],str(rssi), macDict['mac_address'],
+#                                          macDict['mac_address_type'],
+#                                              pkt.info, macDict['manufacturer'],macDict['known_device']))
 ######################################################################
 #
 # NonRandomCloseMACPacketHandler()
@@ -136,9 +142,9 @@ def NonRandomCloseMACPacketHandler(pkt) :
                         and macDict['known_device'] != "Amazon Echo" \
                         and macDict['known_device'] != "NBR2":
 
-                        print formatString.format("", str(datetime.datetime.now().time())[0:8],rssi, macDict['mac_address'],
+                        print (formatString.format("", str(datetime.datetime.now().time())[0:8],rssi, macDict['mac_address'],
                                           macDict['mac_address_type'],
-                                              pkt.info, macDict['manufacturer'],macDict['known_device'])
+                                              pkt.info, macDict['manufacturer'],macDict['known_device']))
 ######################################################################
 #
 # uniqueKnownPacketHandler()
@@ -156,19 +162,24 @@ def uniqueKnownPacketHandler(pkt) :
                 thisKnownDevice = globalVar.knownMACs.get(thisMac, "")
 #                print("Size of mac_list in uniqueKnownPacketHandler:")
 #                print(len(mac_list))
+                macDict = detailMac(pkt.addr2)
                 if pkt.addr2 not in mac_list and (len(thisKnownDevice) > 0):
 
                     mac_list.append(pkt.addr2)
-                    thisOui = thisMac[:8].replace(':','-')
-                    thisOui = thisOui.upper()
-                    thisManu=globalVar.ouiRef.get(thisOui,"")
                     try:
                         extra = pkt.notdecoded
                         rssi = -(256 - ord(extra[-4:-3]))
                     except:
                         rssi = -100
-                    print formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
-                                              pkt.info, thisManu,thisKnownDevice)
+                    formatString = "{:<4} {:<8}"
+                    print (formatString.format("123", str(datetime.datetime.now().time())[0:8]))
+#                    formatString = "{:<4} {:<8} {:<4} {:<18} {:<8} {:<20} {:<40} {:<15}"
+#                    print (formatString.format("", str(datetime.datetime.now().time())[0:8],str(rssi), macDict['mac_address'],
+#                                          macDict['mac_address_type'],
+#                                              pkt.info, macDict['manufacturer'],macDict['known_device']))
+
+#                    print (formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
+#                                              pkt.info, thisManu,thisKnownDevice))
 #                    fileOutHandle.write(formatString.format(str(len(mac_list)), str(datetime.datetime.now().time())[0:8],
 #                            rssi, pkt.addr2, pkt.info, thisOui))
     except KeyboardInterrupt:

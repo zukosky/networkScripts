@@ -47,8 +47,8 @@ def uniqueESSIDPacketHandler(pkt) :
                         rssi = -(256 - ord(extra[-4:-3]))
                     except:
                         rssi = -100
-                    print formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
-                                              pkt.info, thisManu,thisKnownDevice)
+                    print (formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
+                                              pkt.info, thisManu,thisKnownDevice))
                     fileOutHandle.write(formatString.format(str(len(mac_list)), str(datetime.datetime.now().time())[0:8],
                             rssi, pkt.addr2, pkt.info, thisOui))
     except KeyboardInterrupt:
@@ -59,17 +59,17 @@ def uniqueESSIDPacketHandler(pkt) :
 
 
 #Scapy by default stores all packets.  Need store=0.
-print formatString.format ("num","Time","Pwr","MAC","MACType","ESSID","Manufacturer","KnownDevice")
+print (formatString.format ("num","Time","Pwr","MAC","MACType","ESSID","Manufacturer","KnownDevice"))
 
 while (True):
 #    sniff(iface="wlan0", prn=allProbesPacketHandler, filter="type mgt subtype probe-req", store=0)
 #    sniff(iface="wlan0", prn = allKnownMACPacketHandler, store=0)
 #    try:
-#    sniff(iface="wlan0", prn = uniquePacketHandler, store=0)
+    sniff(iface="wlan0", prn = uniquePacketHandler, store=0)
 #sniff(iface="wlan0", prn = allKnownMACPacketHandler, store=0)
 #    sniff(iface="wlan0", prn=uniqueKnownPacketHandler, store=0)
-#    sniff(iface="wlan0", prn=uniqueNonRandomMACPacketHandler, filter="type mgt subtype probe-req", store=0)
-    sniff(iface="wlan0", prn=NonRandomCloseMACPacketHandler, filter="type mgt subtype probe-req", store=0)
+# sniff(iface="wlan0", prn=uniqueNonRandomMACPacketHandler, filter="type mgt subtype probe-req", store=0)
+#    sniff(iface="wlan0", prn=NonRandomCloseMACPacketHandler, filter="type mgt subtype probe-req", store=0)
 
 
 #    except KeyboardInterrupt:
