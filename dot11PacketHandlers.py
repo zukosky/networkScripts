@@ -4,12 +4,15 @@ import time
 import datetime
 import sys
 import globalVar
+import signal
 from netutils import *
 mac_list = []
+pkt_list = []
 
 DOT11_MANAGEMENT_FRAME = 0
 DOT11_PROBE_REQUEST = 4
 formatString = "{:<4} {:<8} {:<4} {:<18} {:<8} {:<20} {:<40} {:<15}"
+
 
 ######################################################################
 #
@@ -71,10 +74,44 @@ def allKnownMACPacketHandler(pkt):
 ######################################################################
 
 def uniquePacketHandler(pkt) :
+    try:
+        if pkt.haslayer(Dot11) :
+            if pkt.type == DOT11_MANAGEMENT_FRAME and pkt.subtype == DOT11_PROBE_REQUEST :
+                MACType = getMACAddressType(pkt.addr2)
+                if pkt.addr2 not in mac_list and MACType == "Factory":
+                    mac_list.append(pkt.addr2)
+                    thisMac = pkt.addr2
+                    thisOui = thisMac[:8].replace(':','-')
+                    thisOui = thisOui.upper()
+                    thisManu=globalVar.ouiRef.get(thisOui,"")
+                    thisKnownDevice = globalVar.knownMACs.get(thisMac, "")
+                    try:
+                        extra = pkt.notdecoded
+                        rssi = -(256 - ord(extra[-4:-3]))
+                    except:
+                        rssi = -100
+                    print (formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
+                                                pkt.info.decode("utf-8"), thisManu,thisKnownDevice))
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except:
+        e = sys.exc_info()[0]
+
+######################################################################
+#
+# allFactoryPacketHandler()
+#
+# This packet handler is for capturing and logging to disk
+# all probes with factory MACs.
+#
+######################################################################
+
+def allFactoryPacketHandler(pkt) :
     if pkt.haslayer(Dot11) :
         if pkt.type == DOT11_MANAGEMENT_FRAME and pkt.subtype == DOT11_PROBE_REQUEST :
-            if pkt.addr2 not in mac_list:
-                mac_list.append(pkt.addr2)
+            MACType = getMACAddressType(pkt.addr2)
+            if MACType == "Factory":
+                pkt_list.append(pkt.addr2)
                 thisMac = pkt.addr2
                 thisOui = thisMac[:8].replace(':','-')
                 thisOui = thisOui.upper()
@@ -85,8 +122,8 @@ def uniquePacketHandler(pkt) :
                     rssi = -(256 - ord(extra[-4:-3]))
                 except:
                     rssi = -100
-                print (formatString.format(len(mac_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
-                                              pkt.info.decode("utf-8"), thisManu,thisKnownDevice))
+                print (formatString.format(len(pkt_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
+                                                pkt.info.decode("utf-8"), thisManu,thisKnownDevice))
 ######################################################################
 #
 # uniqueNonRandomMACPacketHandler()
