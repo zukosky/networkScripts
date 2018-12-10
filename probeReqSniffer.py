@@ -34,6 +34,7 @@ fOutName = "probeOut.txt"
 fileOutHandle = open(fOutName, 'w')
 #Read the list of known (mostly local) MACs
 globalVar.knownMACs = readKnownMACs()
+globalVar.hiddenMACs = readHiddenMACs()
 #Scapy by default stores all packets.  Need store=0.
 print (formatString.format ("num","Time","Pwr","MAC","MACType","ESSID","Manufacturer","KnownDevice"))
 

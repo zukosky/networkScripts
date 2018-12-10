@@ -1,6 +1,7 @@
 import globalVar
 import time
 import sys, os, signal, random
+import datetime
 #################################################################
 # Function for deciding if a MAC address is random/administratively assigned
 #################################################################
@@ -47,6 +48,23 @@ def readKnownMACs():
     knownMACs = dict(zip(oui,desc))
     return knownMACs
 #################################################################
+# Function for reading the list of addresses who's logging should 
+# be suppressed (hidden)
+#################################################################
+def readHiddenMACs():
+    oui=[]
+    desc=[]
+    lmfname= "hiddenMACs.txt"
+    fileHandle = open(lmfname, 'r')
+    for line in fileHandle:
+        if line[0:0] != "#" and len(line) > 1 :
+            fields = line.split('#')  # Only reads one line at a time
+            oui.append(fields[0])
+            desc.append(fields[1])            
+    fileHandle.close()
+    hiddenMACs = oui  #Temporarily just storing the oui
+    return hiddenMACs
+#################################################################
 # Function for creating a dictionary of important characteristics of a MAC address
 #################################################################
 def detailMac(macaddr):
@@ -63,6 +81,30 @@ def detailMac(macaddr):
     macDetails['known_device'] = globalVar.knownMACs.get(macaddr, "")
     macDetails['mac_address_type'] = getMACAddressType(macaddr)
     return macDetails
+#################################################################
+# Function for creating a dictionary of important characteristics
+# from an 802.11 probe packet
+#################################################################
+def parse80211Packet(pkt):
+
+    pktInfo={}
+    pktInfo['mac_address'] = pkt.addr2
+    thisOui = pkt.addr2[:8].replace(':','-')
+    thisOui = thisOui.upper()
+    pktInfo['oui'] = thisOui
+    pktInfo['manufacturer'] = globalVar.ouiRef.get(thisOui,"")
+    pktInfo['known_device'] = globalVar.knownMACs.get(pkt.addr2, "")
+    pktInfo['mac_address_type'] = getMACAddressType(pkt.addr2)
+    pktInfo['datetime'] = str(datetime.datetime.now().time())    
+    pktInfo['datetime_short'] = str(datetime.datetime.now().time())[0:8]        
+    pktInfo['ESSID'] = pkt.info.decode("utf-8")
+    try:
+        extra = pkt.notdecoded
+        rssi = -(256 - ord(extra[-4:-3]))
+    except:
+        rssi = -100
+    pktInfo['rssi'] = rssi
+    return pktInfo
 def set_wifi_channel(chan):
     #################################################################
     # Function for changing the channel the WIFI card is listening on

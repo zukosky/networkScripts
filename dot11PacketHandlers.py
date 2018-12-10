@@ -102,28 +102,43 @@ def uniquePacketHandler(pkt) :
 # allFactoryPacketHandler()
 #
 # This packet handler is for capturing and logging to disk
-# all probes with factory MACs.
+# all probes with factory MACs.xxx
 #
 ######################################################################
 
 def allFactoryPacketHandler(pkt) :
     if pkt.haslayer(Dot11) :
         if pkt.type == DOT11_MANAGEMENT_FRAME and pkt.subtype == DOT11_PROBE_REQUEST :
+#            print("Have a packet")
             MACType = getMACAddressType(pkt.addr2)
+#            print("MAC Address is:" + MACType)
             if MACType == "Factory":
-                pkt_list.append(pkt.addr2)
-                thisMac = pkt.addr2
-                thisOui = thisMac[:8].replace(':','-')
-                thisOui = thisOui.upper()
-                thisManu=globalVar.ouiRef.get(thisOui,"")
-                thisKnownDevice = globalVar.knownMACs.get(thisMac, "")
-                try:
-                    extra = pkt.notdecoded
-                    rssi = -(256 - ord(extra[-4:-3]))
-                except:
-                    rssi = -100
-                print (formatString.format(len(pkt_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
-                                                pkt.info.decode("utf-8"), thisManu,thisKnownDevice))
+                pktDict = parse80211Packet(pkt)
+                print("Parsed a packet")
+                print(globalVar.hiddenMACs.values() )
+                if pktDict['mac_address'] not in globalVar.hiddenMACs.values() :
+#                if True :
+                    print("Not in our oui list")
+                    pkt_list.append(pktDict)
+                    #thisMac = pkt.addr2
+                    #thisOui = thisMac[:8].replace(':','-')
+                    #thisOui = thisOui.upper()
+                    #thisManu=globalVar.ouiRef.get(thisOui,"")
+                    #thisKnownDevice = globalVar.knownMACs.get(thisMac, "")
+                    #try:
+                    #    extra = pkt.notdecoded
+                    #    rssi = -(256 - ord(extra[-4:-3]))
+                    #except:
+                    #    rssi = -100
+                    print (formatString.format(len(pkt_list), pktDict['datetime_short'], 
+                        pktDict['rssi'],
+                        pktDict['mac_address'],
+                        pktDict['mac_address_type'],
+                        pktDict['ESSID'],
+                        pktDict['manufacturer'],
+                        pktDict['known_device']))
+#                print (formatString.format(len(pkt_list), str(datetime.datetime.now().time())[0:8],rssi, pkt.addr2,getMACAddressType(pkt.addr2),
+#                                                pkt.info.decode("utf-8"), thisManu,thisKnownDevice))
 ######################################################################
 #
 # uniqueNonRandomMACPacketHandler()
